@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NICU Milk Tracker</title>
+    <style>
+        :root { --primary: #0284c7; --primary-hover: #0369a1; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --text-light: #64748b; --success: #16a34a; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); padding: 12px; margin: 0; box-sizing: border-box; }
+        .app-container { max-width: 480px; margin: 0 auto; background: var(--card); border-radius: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding: 20px; min-height: 90vh; display: flex; flex-direction: column; position: relative; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; }
+        .header h1 { margin: 0; font-size: 22px; color: var(--primary); }
+        .header p { margin: 4px 0 0; font-size: 13px; color: var(--text-light); }
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #e2e8f0; padding: 4px; border-radius: 8px; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 10px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; color: var(--text-light); transition: all 0.2s; }
+        .tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); }
+        .tab-content { display: none; flex: 1; }
+        .tab-content.active { display: block; }
+        label { display: block; font-weight: 600; margin: 12px 0 4px; font-size: 13px; color: var(--text); }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; box-sizing: border-box; background-color: #fff; color: var(--text); }
+        input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+        .row { display: flex; gap: 12px; }
+        .row > div { flex: 1; }
+        button.submit-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 24px; cursor: pointer; transition: background 0.2s; }
+        button.submit-btn:hover { background: var(--primary-hover); }
+        .search-box { background: #f0f9ff; border: 1px solid #bae6fd; padding: 16px; border-radius: 12px; margin-bottom: 20px; }
+        .result-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 15px; text-align: center; }
+        .result-val { font-size: 36px; font-weight: 800; color: var(--success); margin: 8px 0; }
+        #statusMessage { text-align: center; margin-top: 15px; font-weight: 600; font-size: 14px; padding: 10px; border-radius: 8px; display: none; }
+        .status-success { background: #dcfce7; color: #15803d; display: block !important; }
+        .status-loading { background: #fef9c3; color: #a16207; display: block !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>NICU Lactation Hub</h1>
+        <p>Secure Breastmilk Tracking System</p>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('deposit')">Staff Deposit</button>
+        <button class="tab-btn" onclick="switchTab('mother')">Mother Portal</button>
+    </div>
+
+    <!-- TAB 1: NURSE/STAFF DEPOSIT FORM -->
+    <div id="depositTab" class="tab-content active">
+        <form id="milkForm">
+            <label>Name of Mother</label>
+            <input type="text" id="motherName" required placeholder="Jane Doe">
+
+            <label>Baby Registration ID</label>
+            <input type="text" id="babyRegId" required placeholder="NICU-1024-X">
+
+            <div class="row">
+                <div>
+                    <label>Volume (ml)</label>
+                    <input type="number" id="volume" required placeholder="50">
+                </div>
+                <div>
+                    <label>Milk Bag Number</label>
+                    <input type="text" id="milkBagNum" required placeholder="Bag #1">
+                </div>
+            </div>
+
+            <label>Storage Location</label>
+            <select id="storageLoc">
+                <option value="NICU Main Freezer">NICU Main Freezer</option>
+                <option value="NICU Deep Freeze (Long Term)">NICU Deep Freeze (Long Term)</option>
+                <option value="NICU Shared Refrigerator">NICU Shared Refrigerator</option>
+            </select>
+
+            <div class="row">
+                <div>
+                    <label>Date Expressed</label>
+                    <input type="date" id="dateExpressed" required>
+                </div>
+                <div>
+                    <label>Time Expressed</label>
+                    <input type="time" id="timeExpressed" required>
+                </div>
+            </div>
+
+            <label>Nursing Personnel Facilitating Deposit</label>
+            <input type="text" id="nursePersonnel" required placeholder="Nurse Name / ID">
+
+            <label>Notes</label>
+            <textarea id="notes" rows="2" placeholder="Colostrum, fortified, midnight expression, etc."></textarea>
+
+            <button type="submit" class="submit-btn">Submit Deposit Log</button>
+        </form>
+    </div>
+
+    <!-- TAB 2: MOTHER PRIVATE LOOKUP PORTAL -->
+    <div id="motherTab" class="tab-content">
+        <div class="search-box">
+            <label style="margin-top:0;">Enter Baby Registration ID</label>
+            <p style="margin: 0 0 10px 0; font-size:12px; color: var(--text-light);">Enter your secure ID to check your lifetime balance.</p>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="searchBabyId" placeholder="e.g. NICU-1024-X" style="flex:1;">
+                <button onclick="lookupVolume()" style="background:var(--primary); color:white; border:none; padding:0 16px; border-radius:8px; font-weight:bold;">Check</button>
+            </div>
+        </div>
+
+        <div id="searchResult" class="result-card" style="display:none;">
+            <div style="font-size:14px; font-weight:600; color:var(--text-light);">Total Deposited Volume</div>
+            <div class="result-val" id="totalDisplay">0 ml</div>
+            <div style="font-size:12px; color:var(--text-light);" id="motherDisplay">Mother: -</div>
+        </div>
+    </div>
+
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    // ⚠️ PASTE YOUR COPIED WEB APP URL BETWEEN THE QUOTES BELOW:
+    const WEB_APP_URL = https://script.google.com/macros/s/AKfycby3c_cG-Ng2PxKUNpazr3IxJHHWJxG1qFr9oqpJUqYJu8RBEMPwNDAT5JTXg5n7tFj3/exec
+;
+
+    // Set today's date automatically as default on forms
+    document.getElementById('dateExpressed').value = new Date().toISOString().split('T')[0];
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        hideStatus();
+        
+        if(tabName === 'deposit') {
+            document.querySelector('[onclick="switchTab(\'deposit\')"]').classList.add('active');
+            document.getElementById('depositTab').classList.add('active');
+        } else {
+            document.querySelector('[onclick="switchTab(\'mother\')"]').classList.add('active');
+            document.getElementById('motherTab').classList.add('active');
+        }
+    }
+
+    function showStatus(text, type) {
+        const el = document.getElementById('statusMessage');
+        el.innerText = text;
+        el.className = type === 'success' ? 'status-success' : 'status-loading';
+    }
+
+    function hideStatus() {
+        document.getElementById('statusMessage').className = '';
+    }
+
+    // FORM SUBMISSION (STAFF DEPOSIT)
+    document.getElementById('milkForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        showStatus("Saving log to secure clinical sheet...", "loading");
+
+        const payload = {
+            motherName: document.getElementById('motherName').value,
+            babyRegId: document.getElementById('babyRegId').value,
+            volume: parseFloat(document.getElementById('volume').value),
+            milkBagNum: document.getElementById('milkBagNum').value,
+            storageLoc: document.getElementById('storageLoc').value,
+            dateExpressed: document.getElementById('dateExpressed').value,
+            timeExpressed: document.getElementById('timeExpressed').value,
+            nursePersonnel: document.getElementById('nursePersonnel').value,
+            notes: document.getElementById('notes').value
+        };
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            showStatus("Success! Deposit securely recorded.", "success");
+            document.getElementById('milkForm').reset();
+            document.getElementById('dateExpressed').value = new Date().toISOString().split('T')[0];
+        })
+        .catch(err => {
+            showStatus("Error updating log. Please check your data network.", "loading");
+            console.error(err);
+        });
+    });
+
+    // LOOKUP DATABASE FOR MOTHER
+    function lookupVolume() {
+        const searchId = document.getElementById('searchBabyId').value.trim().toUpperCase();
+        if(!searchId) return;
+
+        showStatus("Searching records...", "loading");
+        document.getElementById('searchResult').style.display = 'none';
+
+        fetch(WEB_APP_URL)
+        .then(res => res.json())
+        .then(data => {
+            hideStatus();
+            const records = data.reverse();
