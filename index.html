@@ -99,7 +99,7 @@
             <p style="margin: 0 0 10px 0; font-size:12px; color: var(--text-light);">Enter your secure ID to check your lifetime balance.</p>
             <div style="display:flex; gap:8px;">
                 <input type="text" id="searchBabyId" placeholder="e.g. NICU-1024-X" style="flex:1;">
-                <button onclick="lookupVolume()" style="background:var(--primary); color:white; border:none; padding:0 16px; border-radius:8px; font-weight:bold;">Check</button>
+                <button type="button" onclick="lookupVolume()" style="background:var(--primary); color:white; border:none; padding:0 16px; border-radius:8px; font-weight:bold;">Check</button>
             </div>
         </div>
 
@@ -115,8 +115,7 @@
 
 <script>
     // ⚠️ PASTE YOUR COPIED WEB APP URL BETWEEN THE QUOTES BELOW:
-    const WEB_APP_URL = https://script.google.com/macros/library/d/1hGDMA8VmRko7TAiBVXL2XmwbUzA9INdnn9AYx7hSIHA3350ock4W7tVv/2
-;
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwRYPdeSmJcOv4eDpelNLxPQ762rco-Oghpo7hG5RkNYaQLaOMoW5LMUD02x8jPCKNS/exec";
 
     // Set today's date automatically as default on forms
     document.getElementById('dateExpressed').value = new Date().toISOString().split('T')[0];
